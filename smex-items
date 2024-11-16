@@ -1,0 +1,29 @@
+
+;; ----- smex-history -----
+(
+ org-mode
+ math-preview-all
+ package-install
+ package-refresh-contents
+ org-date-from-calendar
+ time-stamp
+ customize-variable
+)
+
+;; ----- smex-data -----
+(
+ (compile . 23)
+ (customize-variable . 12)
+ (customize . 1)
+ (eval-region . 1)
+ (LaTeX-mode . 1)
+ (html-mode . 1)
+ (org-mode . 2)
+ (org-indent-mode . 3)
+ (org-date-from-calendar . 2)
+ (org-latex-preview . 12)
+ (time-stamp . 3)
+ (package-install . 5)
+ (package-refresh-contents . 1)
+ (math-preview-all . 9)
+)
