@@ -92,3 +92,24 @@
                           `(org-document-title ((t (,@headline ,@variable-tuple :height 1.5 :underline nil))))))
 (setq org-preview-latex-default-process 'dvisvgm)
 (setq org-image-actual-width 300)
+(use-package eglot
+  :ensure t
+  :config
+  (add-hook 'haskell-mode-hook 'eglot-ensure)
+  :config
+  (setq-default eglot-workspace-configuration
+                '((haskell
+                   (plugin
+                    (stan
+                     (globalOn . :json-false))))))  ;; disable stan
+  :custom
+  (eglot-autoshutdown t)  ;; shutdown language server after closing last file
+  (eglot-confirm-server-initiated-edits nil)  ;; allow edits without confirmation
+  )
+(add-hook 'haskell-mode-hook #'lsp)
+(add-hook 'haskell-literate-mode-hook #'lsp)
+
+
+(let ((path (shell-command-to-string ". ~/.zshrc >/dev/null 2>&1; echo -n $PATH")))
+  (setenv "PATH" path)
+  (setq exec-path path))
