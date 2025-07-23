@@ -6,14 +6,18 @@
  '(auto-save-default nil)
  '(compilation-scroll-output 'first-error)
  '(custom-safe-themes
-   '("e13beeb34b932f309fb2c360a04a460821ca99fe58f69e65557d6c1b10ba18c7" default))
+   '("e13beeb34b932f309fb2c360a04a460821ca99fe58f69e65557d6c1b10ba18c7"
+     default))
  '(display-line-numbers-type 'visual)
  '(org-format-latex-options
-   '(:foreground default :background default :scale 2.0 :html-foreground "Black" :html-background "Transparent" :html-scale 1.0 :matchers
-		 ("begin" "$1" "$" "$$" "\\(" "\\[")))
+   '(:foreground default :background default :scale 2.0 :html-foreground
+		 "Black" :html-background "Transparent" :html-scale
+		 1.0 :matchers ("begin" "$1" "$" "$$" "\\(" "\\[")))
  '(org-startup-indented t)
  '(package-selected-packages
-   '(pet haskell-mode math-preview nerd-icons mathjax org-bullets multiple-cursors smex gruber-darker dash-functional dash gruber-darker-theme)))
+   '(dash dash-functional gruber-darker gruber-darker-theme haskell-mode
+	  magit math-preview mathjax multiple-cursors nerd-icons
+	  org-bullets pet smex)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
