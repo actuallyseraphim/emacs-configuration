@@ -132,5 +132,44 @@
 
 (global-set-key (kbd "C-,") 'rc/duplicate-line)
 
+(use-package exec-path-from-shell
+  :ensure t
+  :config
+  (when (memq window-system '(mac ns x))
+    (exec-path-from-shell-initialize)))
+
 (use-package magit
   :ensure t)
+
+(use-package haskell-mode
+  :ensure t)
+
+(use-package lsp-mode
+  :ensure t
+  :init
+  (setq lsp-keymap-prefix "C-c l")
+  :hook ((lsp-mode . lsp-enable-which-key-integration))
+  :commands (lsp lsp-deferred))
+
+(use-package which-key
+  :ensure t
+  :config
+  (which-key-mode)) 
+
+(use-package lsp-ui
+  :ensure
+  :commands lsp-ui-mode)
+
+(use-package lsp-ivy
+  :ensure t
+  :commands lsp-ivy-workspace-symbol)
+
+(use-package lsp-treemacs
+  :ensure t
+  :commands lsp-treemacs-errors-list)
+
+(use-package lsp-haskell
+  :ensure t
+  :hook ((haskell-mode . lsp-deferred)
+         (haskell-literate-mode . lsp-deferred)))
+
