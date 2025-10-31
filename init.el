@@ -25,6 +25,8 @@
   :config
   (load-theme 'gruber-darker))
 
+(add-to-list 'default-frame-alist '(alpha-background . 92))
+
 (add-to-list 'default-frame-alist '(font . "Fira Code-24"))
 ;; https://github.com/mickeynp/ligature.el/wiki
 (use-package ligature
@@ -173,3 +175,6 @@
   :hook ((haskell-mode . lsp-deferred)
          (haskell-literate-mode . lsp-deferred)))
 
+(use-package company
+  :ensure t
+  :hook (after-init . global-company-mode))
