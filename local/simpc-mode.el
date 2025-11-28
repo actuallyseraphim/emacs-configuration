@@ -71,7 +71,7 @@
 (defun simpc--desired-indentation ()
   (let* ((cur-line (string-trim-right (thing-at-point 'line t)))
          (prev-line (string-trim-right (simpc--previous-non-empty-line)))
-         (indent-len 4)
+         (indent-len 2)
          (prev-indent (simpc--indentation-of-previous-non-empty-line)))
     (cond
      ((string-match-p "^\\s-*switch\\s-*(.+)" prev-line)
