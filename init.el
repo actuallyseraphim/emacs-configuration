@@ -1,4 +1,5 @@
 (setq custom-file (file-name-concat user-emacs-directory "custom.init.el"))
+(add-to-list 'load-path (file-name-concat user-emacs-directory "local"))
 (load custom-file)
 
 (tool-bar-mode -1)
@@ -10,6 +11,7 @@
 (setq inhibit-startup-screen t)
 (setq ring-bell-function 'ignore)
 (setq warning-minimum-level :error)
+(setq make-backup-files nil)
 
 (require 'package)
 (add-to-list 'package-archives '("gnu"   . "https://elpa.gnu.org/packages/"))
@@ -24,8 +26,6 @@
   :ensure t
   :config
   (load-theme 'gruber-darker))
-
-(add-to-list 'default-frame-alist '(alpha-background . 92))
 
 (add-to-list 'default-frame-alist '(font . "Fira Code-24"))
 ;; https://github.com/mickeynp/ligature.el/wiki
@@ -101,7 +101,12 @@
   ;; per mode with `ligature-mode'.
   (global-ligature-mode t))
 
-(load (file-name-concat user-emacs-directory "local" "simpc-mode.el"))
+(require 'simpc-mode)
+(add-to-list 'auto-mode-alist '("\\.[hc]\\(pp\\)?\\'" . simpc-mode))
+(add-to-list 'auto-mode-alist '("\\.[b]\\'" . simpc-mode))
+
+(require 'fasm-mode)
+(add-to-list 'auto-mode-alist '("\\.asm\\'" . fasm-mode))
 
 (ido-mode 1)
 (ido-everywhere 1)
@@ -152,6 +157,10 @@
   (setq lsp-keymap-prefix "C-c l")
   :hook ((lsp-mode . lsp-enable-which-key-integration))
   :commands (lsp lsp-deferred))
+
+(with-eval-after-load 'lsp-mode
+  (add-to-list 'lsp-language-id-configuration '(simpc-mode . "c")))
+(add-hook 'simpc-mode-hook #'lsp-deferred)
 
 (use-package which-key
   :ensure t
