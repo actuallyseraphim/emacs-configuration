@@ -1,3 +1,4 @@
+(setq gc-cons-threshold 100000000)
 (setq custom-file (file-name-concat user-emacs-directory "custom.init.el"))
 (add-to-list 'load-path (file-name-concat user-emacs-directory "local"))
 (load custom-file)
@@ -7,11 +8,22 @@
 (scroll-bar-mode -1)
 (global-display-line-numbers-mode 1)
 
+
 (setq display-line-numbers-type 'relative)
 (setq inhibit-startup-screen t)
 (setq ring-bell-function 'ignore)
 (setq warning-minimum-level :error)
 (setq make-backup-files nil)
+
+
+(setq display-time-format "%H:%M:%S  %a %d %b")
+(setq display-time-day-and-date t)
+(setq display-time-default-load-average nil)
+(setq display-time-interval 1)
+(display-time-mode 1)
+(display-battery-mode 1)
+
+(set-face-attribute 'mode-line nil :height 0.8)
 
 (require 'package)
 (add-to-list 'package-archives '("gnu"   . "https://elpa.gnu.org/packages/"))
@@ -27,7 +39,7 @@
   :config
   (load-theme 'gruber-darker))
 
-(add-to-list 'default-frame-alist '(font . "Fira Code-24"))
+(add-to-list 'default-frame-alist '(font . "Fira Code-16"))
 ;; https://github.com/mickeynp/ligature.el/wiki
 (use-package ligature
   :ensure t
@@ -187,3 +199,32 @@
 (use-package company
   :ensure t
   :hook (after-init . global-company-mode))
+
+(use-package exwm
+  :ensure t)
+
+(setq exwm-workspace-number 4)
+
+(add-hook 'exwm-update-class-hook
+  (lambda () (exwm-workspace-rename-buffer exwm-class-name)))
+
+(add-hook 'exwm-init-hook
+  (lambda () (exwm-workspace-switch-create 1)))
+
+(define-key exwm-mode-map [?\C-q] 'exwm-input-send-next-key)
+  
+(setq exwm-input-global-keys
+      `(([?\s-r] . exwm-reset) ;; s-r: Reset (to line-mode).
+        ([?\s-w] . exwm-workspace-switch) ;; s-w: Switch workspace.
+	([?\s-f] . exwm-layout-toggle-fullscreen)
+        ([?\s-&] . (lambda (cmd) ;; s-&: Launch application.
+                     (interactive (list (read-shell-command "$ ")))
+                     (start-process-shell-command cmd nil cmd)))
+        ;; s-N: Switch to certain workspace.
+        ,@(mapcar (lambda (i)
+                    `(,(kbd (format "s-%d" i)) .
+                      (lambda ()
+                        (interactive)
+                        (exwm-workspace-switch-create, i))))
+                  (number-sequence 0 9))))
+(exwm-wm-mode)
