@@ -27,7 +27,7 @@
   :config
   (load-theme 'gruber-darker))
 
-(add-to-list 'default-frame-alist '(font . "Fira Code-24"))
+(add-to-list 'default-frame-alist '(font . "Fira Code-16"))
 ;; https://github.com/mickeynp/ligature.el/wiki
 (use-package ligature
   :ensure t
@@ -108,6 +108,12 @@
 (require 'fasm-mode)
 (add-to-list 'auto-mode-alist '("\\.asm\\'" . fasm-mode))
 
+(add-to-list 'auto-mode-alist '("\\.fsh\\'" . glsl-mode))
+(add-to-list 'auto-mode-alist '("\\.vsh\\'" . glsl-mode))
+(add-to-list 'auto-mode-alist '("\\.gsh\\'" . glsl-mode))
+(add-to-list 'auto-mode-alist '("\\.csh\\'" . glsl-mode))
+
+
 (ido-mode 1)
 (ido-everywhere 1)
 (use-package smex
@@ -151,39 +157,35 @@
 (use-package haskell-mode
   :ensure t)
 
+
 (use-package lsp-mode
   :ensure t
   :init
   (setq lsp-keymap-prefix "C-c l")
-  :hook ((lsp-mode . lsp-enable-which-key-integration))
-  :commands (lsp lsp-deferred))
+  :hook ((java-mode . lsp)
+	 (lsp-mode . lsp-enable-which-key-integration))
+  :commands lsp)
 
-(with-eval-after-load 'lsp-mode
-  (add-to-list 'lsp-language-id-configuration '(simpc-mode . "c")))
-(add-hook 'simpc-mode-hook #'lsp-deferred)
+(use-package lsp-ui
+  :ensure t
+  :commands lsp-ui-mode)
+
+(use-package helm-lsp
+  :ensure t
+  :commands helm-lsp-workspace-symbol)
+
+(use-package dap-mode
+  :ensure t)
 
 (use-package which-key
   :ensure t
   :config
-  (which-key-mode)) 
+  (which-key-mode))
 
-(use-package lsp-ui
-  :ensure
-  :commands lsp-ui-mode)
 
-(use-package lsp-ivy
-  :ensure t
-  :commands lsp-ivy-workspace-symbol)
+(require 'project)
 
-(use-package lsp-treemacs
-  :ensure t
-  :commands lsp-treemacs-errors-list)
-
-(use-package lsp-haskell
-  :ensure t
-  :hook ((haskell-mode . lsp-deferred)
-         (haskell-literate-mode . lsp-deferred)))
-
-(use-package company
-  :ensure t
-  :hook (after-init . global-company-mode))
+(add-to-list 'project-vc-extra-root-markers "build.gradle")
+(add-to-list 'project-vc-extra-root-markers "build.gradle.kts")
+(add-to-list 'project-vc-extra-root-markers "settings.gradle")
+(add-to-list 'project-vc-extra-root-markers "settings.gradle.kts")
