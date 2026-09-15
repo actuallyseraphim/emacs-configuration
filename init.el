@@ -1,17 +1,26 @@
 (setq custom-file (file-name-concat user-emacs-directory "custom.init.el"))
 (add-to-list 'load-path (file-name-concat user-emacs-directory "local"))
-(load custom-file)
+(load custom-file t)
 
 (tool-bar-mode -1)
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
-(global-display-line-numbers-mode 1)
+(add-hook 'prog-mode-hook (lambda() (display-line-numbers-mode 1)))
+(add-hook 'text-mode-hook (lambda() (display-line-numbers-mode 1)))
+
+(setq backup-directory-alist
+      `(("." . ,(concat user-emacs-directory "backups"))))
 
 (setq display-line-numbers-type 'relative)
 (setq inhibit-startup-screen t)
 (setq ring-bell-function 'ignore)
 (setq warning-minimum-level :error)
 (setq make-backup-files nil)
+(setq-default indent-tabs-mode nil)
+
+(c-set-offset 'arglist-intro '+)
+(c-set-offset 'arglist-cont-nonempty '+)
+(c-set-offset 'arglist-close '0)
 
 (require 'package)
 (add-to-list 'package-archives '("gnu"   . "https://elpa.gnu.org/packages/"))
@@ -114,6 +123,8 @@
 (add-to-list 'auto-mode-alist '("\\.csh\\'" . glsl-mode))
 
 
+(require 'simpc3-mode)
+
 (ido-mode 1)
 (ido-everywhere 1)
 (use-package smex
@@ -144,6 +155,8 @@
     (forward-char column)))
 
 (global-set-key (kbd "C-,") 'rc/duplicate-line)
+
+(add-hook 'after-init-hook 'global-company-mode)
 
 (use-package exec-path-from-shell
   :ensure t
@@ -182,10 +195,86 @@
   :config
   (which-key-mode))
 
-
 (require 'project)
-
 (add-to-list 'project-vc-extra-root-markers "build.gradle")
 (add-to-list 'project-vc-extra-root-markers "build.gradle.kts")
 (add-to-list 'project-vc-extra-root-markers "settings.gradle")
 (add-to-list 'project-vc-extra-root-markers "settings.gradle.kts")
+
+(use-package websocket
+  :ensure t)
+
+(use-package typst-preview
+  :ensure t
+  :init
+  (setq typst-preview-autostart t)
+  (setq typst-preview-open-browser-automatically t)
+
+  :custom
+  (typst-preview-browser "xwidget")
+  (typst-preview-executable "tinymist")
+  (typst-preview-partial-rendering t)
+  
+  :config
+  (define-key typst-preview-mode-map (kbd "C-c C-j") 'typst-preview-send-position))
+
+(defun typst-preview-xwidget (url)
+  (split-window-right)
+  (other-window 1)
+  (xwidget-webkit-browse-url url))
+
+(with-eval-after-load 'typst-preview
+  (advice-add
+   'typst-preview--connect-browser
+   :override
+   (lambda (browser hostname)
+     (pcase browser
+       ("xwidget"
+        (typst-preview-xwidget (concat "http://" hostname)))
+       ("default"
+        (browse-url (concat "http://" hostname)))
+       ("eaf-browser"
+        (eaf-open-browser-other-window (concat "http://" hostname)))))))
+
+(defvar denote-typst-front-matter
+  "// title:      %s
+// date:       %s
+// tags:       %s
+// identifier: %s
+"
+  "Front matter for new Typst notes created by Denote.")
+
+(defvar denote-typst-link-format "// %2$s <denote:%1$s>"
+  "Format of a Denote link inside a Typst file.")
+
+(defvar denote-typst-link-in-context-regexp
+  "//.*?<denote:\\([0-9]\\{8\\}T[0-9]\\{6\\}\\)>"
+  "Regexp matching `my-denote-typst-link-format' in context.")
+
+(use-package denote
+  :ensure t
+  :hook (dired-mode . denote-dired-mode)
+  :bind
+  (("C-c n n" . denote)
+   ("C-c n r" . denote-rename-file)
+   ("C-c n l" . denote-link)
+   ("C-c n b" . denote-backlinks)
+   ("C-c n d" . denote-dired)
+   ("C-c n g" . denote-grep))
+  :config
+  (setq denote-directory (expand-file-name "~/notes/"))
+  (denote-rename-buffer-mode 1)  
+  (add-to-list 'denote-file-types
+               `(typst
+                 :extension ".typ"
+                 :date-function denote-date-iso-8601
+                 :front-matter denote-typst-front-matter
+                 :title-key-regexp "^// title\\s-*:"
+                 :title-value-function identity
+                 :title-value-reverse-function denote-trim-whitespace
+                 :keywords-key-regexp "^// tags\\s-*:"
+                 :keywords-value-function denote-format-keywords-for-text-front-matter
+                 :keywords-value-reverse-function denote-extract-keywords-from-front-matter
+                 :link denote-typst-link-format
+                 :link-in-context-regexp denote-typst-link-in-context-regexp))
+  (setq denote-file-type 'typst))
